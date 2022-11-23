@@ -43,7 +43,7 @@ impl BluefruitLEUARTFriend {
             serial::Config::default()
                 .baudrate(9600.bps())
                 .dma(serial::config::DmaConfig::Rx),
-            &clocks,
+            clocks,
         )
         .expect("USART1 can be set up");
 

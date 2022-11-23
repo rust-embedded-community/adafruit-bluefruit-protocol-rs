@@ -61,7 +61,7 @@ pub const MAX_CONTROLLER_MESSAGE_LENGTH: usize = 32; // give slightly more than 
 
 impl ControllerDataPackageType {
     /// Returns the length of the data section of the command.
-    fn data_len(self: &Self) -> usize {
+    fn data_len(&self) -> usize {
         match self {
             ControllerDataPackageType::ButtonCommand => 2,
             ControllerDataPackageType::Color => 3,
@@ -123,7 +123,7 @@ pub fn parse<const MAX_RESULTS: usize>(
         };
     }
 
-    return result;
+    result
 }
 
 /// Extract a command and then try to parse it.
@@ -162,25 +162,25 @@ fn parse_command(
     let data = &command_input[data_start..=data_end];
     match command {
         ControllerDataPackageType::ButtonCommand => {
-            ButtonEvent::try_from(data).map(|evt| ControllerEvent::ButtonEvent(evt))
+            ButtonEvent::try_from(data).map(ControllerEvent::ButtonEvent)
         }
         ControllerDataPackageType::Color => {
-            ColorEvent::try_from(data).map(|evt| ControllerEvent::ColorEvent(evt))
+            ColorEvent::try_from(data).map(ControllerEvent::ColorEvent)
         }
         ControllerDataPackageType::Quaternion => {
-            QuaternionEvent::try_from(data).map(|evt| ControllerEvent::QuaternionEvent(evt))
+            QuaternionEvent::try_from(data).map(ControllerEvent::QuaternionEvent)
         }
         ControllerDataPackageType::Accelerometer => {
-            AccelerometerEvent::try_from(data).map(|evt| ControllerEvent::AccelerometerEvent(evt))
+            AccelerometerEvent::try_from(data).map(ControllerEvent::AccelerometerEvent)
         }
         ControllerDataPackageType::Gyro => {
-            GyroEvent::try_from(data).map(|evt| ControllerEvent::GyroEvent(evt))
+            GyroEvent::try_from(data).map(ControllerEvent::GyroEvent)
         }
         ControllerDataPackageType::Magnetometer => {
-            MagnetometerEvent::try_from(data).map(|evt| ControllerEvent::MagnetometerEvent(evt))
+            MagnetometerEvent::try_from(data).map(ControllerEvent::MagnetometerEvent)
         }
         ControllerDataPackageType::Location => {
-            LocationEvent::try_from(data).map(|evt| ControllerEvent::LocationEvent(evt))
+            LocationEvent::try_from(data).map(ControllerEvent::LocationEvent)
         }
     }
 }

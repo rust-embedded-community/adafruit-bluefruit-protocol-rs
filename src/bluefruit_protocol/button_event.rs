@@ -32,7 +32,7 @@ impl Button {
             b'6' => Ok(Button::Down),
             b'7' => Ok(Button::Left),
             b'8' => Ok(Button::Right),
-            _ => Err(ButtonParseError::UnknownButton(input.clone())),
+            _ => Err(ButtonParseError::UnknownButton(*input)),
         }
     }
 }
@@ -50,7 +50,7 @@ impl ButtonState {
         match input {
             b'0' => Ok(ButtonState::Released),
             b'1' => Ok(ButtonState::Pressed),
-            _ => Err(ButtonParseError::UnknownButtonState(input.clone())),
+            _ => Err(ButtonParseError::UnknownButtonState(*input)),
         }
     }
 }
@@ -74,10 +74,9 @@ impl TryFrom<&[u8]> for ButtonEvent {
             Err(ProtocolParseError::InvalidLength(expected_len, input.len()))
         } else {
             Ok(ButtonEvent {
-                button: Button::from_id(&input[0])
-                    .map_err(|e| ProtocolParseError::ButtonParseError(e))?,
+                button: Button::from_id(&input[0]).map_err(ProtocolParseError::ButtonParseError)?,
                 state: ButtonState::from_id(&input[1])
-                    .map_err(|e| ProtocolParseError::ButtonParseError(e))?,
+                    .map_err(ProtocolParseError::ButtonParseError)?,
             })
         }
     }
