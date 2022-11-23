@@ -22,9 +22,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
+      # no tests at the moment as the crate currently targets the stm32f4xx-hal and thus can't run on x86
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
