@@ -82,3 +82,12 @@ impl TryFrom<&[u8]> for ButtonEvent {
         }
     }
 }
+
+impl ButtonEvent {
+    pub fn button(&self) -> &Button {
+        &self.button
+    }
+    pub fn state(&self) -> &ButtonState {
+        &self.state
+    }
+}

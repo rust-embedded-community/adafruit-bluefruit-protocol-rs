@@ -113,7 +113,7 @@ pub fn parse<const MAX_RESULTS: usize>(
                 }
             }
             ParserState::ParseCommand => {
-                let data_package = extract_and_parse_command(&input[(pos-1)..]);
+                let data_package = extract_and_parse_command(&input[(pos - 1)..]);
                 result.push(data_package).ok();
                 if result.len() == MAX_RESULTS {
                     return result;
