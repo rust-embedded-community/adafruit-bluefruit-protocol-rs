@@ -1,7 +1,8 @@
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
 /// Represents a gyro event from the protocol.
-#[derive(Debug, defmt::Format)]
+#[derive(PartialEq, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct GyroEvent {
     x: f32,
     y: f32,

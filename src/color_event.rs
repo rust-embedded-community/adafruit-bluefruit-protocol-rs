@@ -1,7 +1,8 @@
 use super::ProtocolParseError;
 
 /// Represents a color event from the protocol.
-#[derive(Debug, defmt::Format)]
+#[derive(PartialEq, Eq, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct ColorEvent {
     red: u8,
     green: u8,
