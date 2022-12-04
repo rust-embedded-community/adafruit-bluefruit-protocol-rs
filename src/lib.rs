@@ -1,5 +1,8 @@
-//! Implements the [Controller Protocol](https://learn.adafruit.com/bluefruit-le-connect/controller) from Adafruit
+//! This implements the [Adafruit Bluefruit LE Connect controller protocol](https://learn.adafruit.com/bluefruit-le-connect/controller)
 //! which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-uart-friend).
+//!
+//! ## Optional features
+//! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 
 #![forbid(unsafe_code)]
 // use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670
