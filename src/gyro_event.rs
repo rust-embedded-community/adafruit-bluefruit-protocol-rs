@@ -1,3 +1,5 @@
+//! Implements the [`GyroEvent`] and its parsing from the protocol.
+
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
 /// Represents a gyro event from the protocol.

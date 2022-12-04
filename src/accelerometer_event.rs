@@ -1,3 +1,5 @@
+//! Implements the [`AccelerometerEvent`] and its parsing from the protocol.
+
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
 /// Represents an accelerometer event from the protocol.

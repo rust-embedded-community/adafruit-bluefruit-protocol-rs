@@ -1,3 +1,5 @@
+//! Implements the [`ColorEvent`] and its parsing from the protocol.
+
 use super::ProtocolParseError;
 
 /// Represents a color event from the protocol.

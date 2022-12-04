@@ -1,3 +1,5 @@
+//! Implements the [`ButtonEvent`] and its parsing from the protocol.
+
 use super::ProtocolParseError;
 
 /// Errors which can be raised while parsing a button event.

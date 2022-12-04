@@ -10,23 +10,23 @@
 #![deny(unused)]
 #![no_std]
 
-mod accelerometer_event;
-mod button_event;
-mod color_event;
-mod gyro_event;
-mod location_event;
-mod magnetometer_event;
-mod quaternion_event;
+pub mod accelerometer_event;
+pub mod button_event;
+pub mod color_event;
+pub mod gyro_event;
+pub mod location_event;
+pub mod magnetometer_event;
+pub mod quaternion_event;
 
-pub use accelerometer_event::AccelerometerEvent;
-pub use button_event::{Button, ButtonEvent, ButtonParseError, ButtonState};
-pub use color_event::ColorEvent;
+use accelerometer_event::AccelerometerEvent;
+use button_event::{ButtonEvent, ButtonParseError};
+use color_event::ColorEvent;
 use core::cmp::min;
-pub use gyro_event::GyroEvent;
+use gyro_event::GyroEvent;
 use heapless::Vec;
-pub use location_event::LocationEvent;
-pub use magnetometer_event::MagnetometerEvent;
-pub use quaternion_event::QuaternionEvent;
+use location_event::LocationEvent;
+use magnetometer_event::MagnetometerEvent;
+use quaternion_event::QuaternionEvent;
 
 /// Lists all (supported) events which can be sent by the controller. These come with the parsed event data and are the result of a [`parse`] call.
 #[derive(PartialEq, Debug)]

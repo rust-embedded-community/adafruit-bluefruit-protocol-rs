@@ -1,3 +1,5 @@
+//! Implements the [`MagnetometerEvent`] and its parsing from the protocol.
+
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
 /// Represents a magnetometer event from the protocol.
