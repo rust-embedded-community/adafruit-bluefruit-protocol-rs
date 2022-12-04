@@ -11,6 +11,7 @@ license = "MIT"
 [dependencies]
 defmt = { version = "0.3", optional = true }
 heapless = { version = "0.7" }
+rgb = { version = "0.8", optional = true }
 
 [features]
 defmt = ["dep:defmt", "heapless/defmt-impl"]

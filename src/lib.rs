@@ -3,6 +3,7 @@
 //!
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
+//! * `rgb`: if enabled, the `ColorEvent` implements `Into<RGB8>` for the [RGB crate](https://crates.io/crates/rgb).
 
 #![forbid(unsafe_code)]
 // use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670

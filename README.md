@@ -8,3 +8,4 @@ Note that this work is not affiliated with Adafruit.
 
 ## Optional features
 * `defmt`: you can enable the [`defmt`](https://defmt.ferrous-systems.com/) feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
+* `rgb`: if enabled, the `ColorEvent` implements `Into<RGB8>` for the [RGB crate](https://crates.io/crates/rgb).

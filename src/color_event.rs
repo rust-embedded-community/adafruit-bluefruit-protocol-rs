@@ -1,6 +1,8 @@
 //! Implements the [`ColorEvent`] and its parsing from the protocol.
 
 use super::ProtocolParseError;
+#[cfg(feature = "rgb")]
+use rgb::RGB8;
 
 /// Represents a color event from the protocol.
 #[derive(PartialEq, Eq, Debug)]
@@ -44,5 +46,16 @@ impl ColorEvent {
 
     pub fn blue(&self) -> u8 {
         self.blue
+    }
+}
+
+#[cfg(feature = "rgb")]
+impl Into<RGB8> for ColorEvent {
+    fn into(self) -> RGB8 {
+        RGB8 {
+            r: self.red,
+            g: self.green,
+            b: self.blue,
+        }
     }
 }
