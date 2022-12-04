@@ -1,5 +1,5 @@
 [package]
-name = "adafruit-bluefruit-rs"
+name = "adafruit-bluefruit-protocol"
 version = "0.1.0"
 edition = "2021"
 
