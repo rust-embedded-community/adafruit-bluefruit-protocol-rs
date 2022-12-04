@@ -1,7 +1,13 @@
-//! Implements the [Controller Protocol](https://learn.adafruit.com/bluefruit-le-connect/controller) from Adafruit.
+//! Implements the [Controller Protocol](https://learn.adafruit.com/bluefruit-le-connect/controller) from Adafruit
+//! which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-uart-friend).
 
-#![deny(unsafe_code)]
+#![forbid(unsafe_code)]
+// use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670
 #![deny(warnings)]
+#![deny(missing_docs)]
+#![forbid(missing_debug_implementations)]
+// use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670
+#![deny(unused)]
 #![no_std]
 
 mod accelerometer_event;
@@ -25,6 +31,7 @@ pub use quaternion_event::QuaternionEvent;
 /// Lists all (supported) events which can be sent by the controller. These come with the parsed event data and are the result of a [`parse`] call.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub enum ControllerEvent {
     ButtonEvent(ButtonEvent),
     ColorEvent(ColorEvent),
@@ -39,16 +46,22 @@ pub enum ControllerEvent {
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ProtocolParseError {
+    /// The message contained an event which is not known to the current implementation. This can either mean that the message was malformed or that a newer protocol version has been used.
     UnknownEvent(Option<u8>),
+    /// An error occurred while parsing a [`ButtonEvent`].
     ButtonParseError(ButtonParseError),
+    /// The event in the message did not have the expected length.
     InvalidLength(usize, usize),
+    /// The event in the message did not have the expected CRC.
     InvalidCrc(u8, u16),
+    /// There was a problem parsing a float from a message.
     InvalidFloatSize(usize),
 }
 
-/// Lists all (supported) data packages which can be sent by the controller. Internal state used during parsing. Use [`ControllerEvent`] to return the actual event.
+/// Lists all data packages which can be sent by the controller. Internal state used during parsing. Use [`ControllerEvent`] to return the actual event.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 enum ControllerDataPackageType {
     ButtonCommand,
     Color,
@@ -143,7 +156,7 @@ fn parse_command(
     command: ControllerDataPackageType,
     command_input: &[u8],
 ) -> Result<ControllerEvent, ProtocolParseError> {
-    #[cfg(feature="defmt")]
+    #[cfg(feature = "defmt")]
     defmt::debug!(
         "parsing the command of type {} from message {:a}",
         command,
@@ -193,7 +206,7 @@ fn parse_command(
 
 /// Check the CRC of a command
 fn check_crc(data: &[u8], crc: &u8) -> Result<(), ProtocolParseError> {
-    #[cfg(feature="defmt")]
+    #[cfg(feature = "defmt")]
     defmt::trace!("calculating CRC for {:a}, expecting {}", data, crc);
 
     let mut sum: u16 = 0;

@@ -3,6 +3,7 @@ use super::ProtocolParseError;
 /// Represents a color event from the protocol.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct ColorEvent {
     red: u8,
     green: u8,
@@ -29,6 +30,7 @@ impl TryFrom<&[u8]> for ColorEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl ColorEvent {
     pub fn red(&self) -> u8 {
         self.red

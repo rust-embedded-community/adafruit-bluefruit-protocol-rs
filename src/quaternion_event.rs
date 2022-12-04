@@ -1,8 +1,9 @@
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
-/// Represents a quaternion event from the protocol.
+/// Represents a [quaternion](https://en.wikipedia.org/wiki/Quaternion) event from the protocol.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct QuaternionEvent {
     x: f32,
     y: f32,
@@ -31,6 +32,7 @@ impl TryFrom<&[u8]> for QuaternionEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl QuaternionEvent {
     pub fn x(&self) -> f32 {
         self.x

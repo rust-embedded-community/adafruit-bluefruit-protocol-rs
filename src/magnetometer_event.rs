@@ -3,6 +3,7 @@ use super::{try_f32_from_le_bytes, ProtocolParseError};
 /// Represents a magnetometer event from the protocol.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct MagnetometerEvent {
     x: f32,
     y: f32,
@@ -29,6 +30,7 @@ impl TryFrom<&[u8]> for MagnetometerEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl MagnetometerEvent {
     pub fn x(&self) -> f32 {
         self.x

@@ -3,6 +3,7 @@ use super::{try_f32_from_le_bytes, ProtocolParseError};
 /// Represents a location event from the protocol.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct LocationEvent {
     latitude: f32,
     longitude: f32,
@@ -29,6 +30,7 @@ impl TryFrom<&[u8]> for LocationEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl LocationEvent {
     pub fn latitude(&self) -> f32 {
         self.latitude

@@ -3,6 +3,7 @@ use super::{try_f32_from_le_bytes, ProtocolParseError};
 /// Represents an accelerometer event from the protocol.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct AccelerometerEvent {
     x: f32,
     y: f32,
@@ -29,6 +30,7 @@ impl TryFrom<&[u8]> for AccelerometerEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl AccelerometerEvent {
     pub fn x(&self) -> f32 {
         self.x

@@ -4,13 +4,16 @@ use super::ProtocolParseError;
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ButtonParseError {
+    /// The message contained an unknown button. For the known buttons see [`Button`].
     UnknownButton(u8),
+    /// The message contained an unknown button state. For the known button states see [`ButtonState`].
     UnknownButtonState(u8),
 }
 
 /// Lists all possible buttons which can be sent in the event.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub enum Button {
     Button1,
     Button2,
@@ -42,6 +45,7 @@ impl Button {
 /// The state of the button.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub enum ButtonState {
     Released,
     Pressed,
@@ -61,6 +65,7 @@ impl ButtonState {
 /// Represents a button event from the protocol.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[allow(missing_docs)] // the names are already obvious enough
 pub struct ButtonEvent {
     button: Button,
     state: ButtonState,
@@ -86,6 +91,7 @@ impl TryFrom<&[u8]> for ButtonEvent {
     }
 }
 
+#[allow(missing_docs)] // the names are already obvious enough
 impl ButtonEvent {
     pub fn button(&self) -> &Button {
         &self.button
