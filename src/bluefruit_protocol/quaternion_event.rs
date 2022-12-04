@@ -29,3 +29,21 @@ impl TryFrom<&[u8]> for QuaternionEvent {
         }
     }
 }
+
+impl QuaternionEvent {
+    pub fn x(&self) -> f32 {
+        self.x
+    }
+
+    pub fn y(&self) -> f32 {
+        self.y
+    }
+
+    pub fn z(&self) -> f32 {
+        self.z
+    }
+
+    pub fn w(&self) -> f32 {
+        self.w
+    }
+}

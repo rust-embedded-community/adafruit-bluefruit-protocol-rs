@@ -27,3 +27,17 @@ impl TryFrom<&[u8]> for LocationEvent {
         }
     }
 }
+
+impl LocationEvent {
+    pub fn latitude(&self) -> f32 {
+        self.latitude
+    }
+
+    pub fn longitude(&self) -> f32 {
+        self.longitude
+    }
+
+    pub fn altitude(&self) -> f32 {
+        self.altitude
+    }
+}

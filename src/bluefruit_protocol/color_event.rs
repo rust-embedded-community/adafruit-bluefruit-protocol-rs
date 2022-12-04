@@ -27,3 +27,17 @@ impl TryFrom<&[u8]> for ColorEvent {
         }
     }
 }
+
+impl ColorEvent {
+    pub fn red(&self) -> u8 {
+        self.red
+    }
+
+    pub fn green(&self) -> u8 {
+        self.green
+    }
+
+    pub fn blue(&self) -> u8 {
+        self.blue
+    }
+}

@@ -27,3 +27,17 @@ impl TryFrom<&[u8]> for GyroEvent {
         }
     }
 }
+
+impl GyroEvent {
+    pub fn x(&self) -> f32 {
+        self.x
+    }
+
+    pub fn y(&self) -> f32 {
+        self.y
+    }
+
+    pub fn z(&self) -> f32 {
+        self.z
+    }
+}
