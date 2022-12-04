@@ -14,4 +14,14 @@ heapless = { version = "0.7" }
 rgb = { version = "0.8", optional = true }
 
 [features]
+default = ["accelerometer_event", "button_event", "color_event", "gyro_event", "location_event", "magnetometer_event", "quaternion_event"]
+
 defmt = ["dep:defmt", "heapless/defmt-impl"]
+
+accelerometer_event = []
+button_event = []
+color_event = []
+gyro_event = []
+location_event = []
+magnetometer_event = []
+quaternion_event = []

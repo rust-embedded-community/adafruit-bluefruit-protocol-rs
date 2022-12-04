@@ -4,6 +4,9 @@
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 //! * `rgb`: if enabled, the `ColorEvent` implements `Into<RGB8>` for the [RGB crate](https://crates.io/crates/rgb).
+//! * All events can be selected as individual features. By default, they are all selected,
+//!   but you can opt to only select the event(s) you are interested in which will result in a small binary size.
+//!   If other events are received, a [`ProtocolParseError::DisabledControllerDataPackageType`] will be returned.
 
 #![forbid(unsafe_code)]
 // use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670
@@ -14,22 +17,47 @@
 #![deny(unused)]
 #![no_std]
 
+#[cfg(not(any(
+    feature = "accelerometer_event",
+    feature = "button_event",
+    feature = "color_event",
+    feature = "gyro_event",
+    feature = "location_event",
+    feature = "magnetometer_event",
+    feature = "quaternion_event"
+)))]
+compile_error!("at least one event type must be selected in the features!");
+
+#[cfg(feature = "accelerometer_event")]
 pub mod accelerometer_event;
+#[cfg(feature = "button_event")]
 pub mod button_event;
+#[cfg(feature = "color_event")]
 pub mod color_event;
+#[cfg(feature = "gyro_event")]
 pub mod gyro_event;
+#[cfg(feature = "location_event")]
 pub mod location_event;
+#[cfg(feature = "magnetometer_event")]
 pub mod magnetometer_event;
+#[cfg(feature = "quaternion_event")]
 pub mod quaternion_event;
 
+#[cfg(feature = "accelerometer_event")]
 use accelerometer_event::AccelerometerEvent;
+#[cfg(feature = "button_event")]
 use button_event::{ButtonEvent, ButtonParseError};
+#[cfg(feature = "color_event")]
 use color_event::ColorEvent;
 use core::cmp::min;
+#[cfg(feature = "gyro_event")]
 use gyro_event::GyroEvent;
 use heapless::Vec;
+#[cfg(feature = "location_event")]
 use location_event::LocationEvent;
+#[cfg(feature = "magnetometer_event")]
 use magnetometer_event::MagnetometerEvent;
+#[cfg(feature = "quaternion_event")]
 use quaternion_event::QuaternionEvent;
 
 /// Lists all (supported) events which can be sent by the controller. These come with the parsed event data and are the result of a [`parse`] call.
@@ -37,12 +65,19 @@ use quaternion_event::QuaternionEvent;
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub enum ControllerEvent {
+    #[cfg(feature = "button_event")]
     ButtonEvent(ButtonEvent),
+    #[cfg(feature = "color_event")]
     ColorEvent(ColorEvent),
+    #[cfg(feature = "quaternion_event")]
     QuaternionEvent(QuaternionEvent),
+    #[cfg(feature = "accelerometer_event")]
     AccelerometerEvent(AccelerometerEvent),
+    #[cfg(feature = "gyro_event")]
     GyroEvent(GyroEvent),
+    #[cfg(feature = "magnetometer_event")]
     MagnetometerEvent(MagnetometerEvent),
+    #[cfg(feature = "location_event")]
     LocationEvent(LocationEvent),
 }
 
@@ -52,7 +87,10 @@ pub enum ControllerEvent {
 pub enum ProtocolParseError {
     /// The message contained an event which is not known to the current implementation. This can either mean that the message was malformed or that a newer protocol version has been used.
     UnknownEvent(Option<u8>),
+    /// The message contained an event which is known to the library but has not been selected as a feature and can thus not be parsed. Select the feature when compiling the library to handle this message.
+    DisabledControllerDataPackageType(ControllerDataPackageType),
     /// An error occurred while parsing a [`ButtonEvent`].
+    #[cfg(feature = "button_event")]
     ButtonParseError(ButtonParseError),
     /// The event in the message did not have the expected length.
     InvalidLength(usize, usize),
@@ -66,7 +104,7 @@ pub enum ProtocolParseError {
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
-enum ControllerDataPackageType {
+pub enum ControllerDataPackageType {
     ButtonCommand,
     Color,
     Quaternion,
@@ -185,27 +223,62 @@ fn parse_command(
     let data = &command_input[data_start..=data_end];
     match command {
         ControllerDataPackageType::ButtonCommand => {
-            ButtonEvent::try_from(data).map(ControllerEvent::ButtonEvent)
+            #[cfg(feature = "button_event")]
+            return ButtonEvent::try_from(data).map(ControllerEvent::ButtonEvent);
+            #[cfg(not(feature = "button_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Color => {
-            ColorEvent::try_from(data).map(ControllerEvent::ColorEvent)
+            #[cfg(feature = "color_event")]
+            return ColorEvent::try_from(data).map(ControllerEvent::ColorEvent);
+            #[cfg(not(feature = "color_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Quaternion => {
-            QuaternionEvent::try_from(data).map(ControllerEvent::QuaternionEvent)
+            #[cfg(feature = "quaternion_event")]
+            return QuaternionEvent::try_from(data).map(ControllerEvent::QuaternionEvent);
+            #[cfg(not(feature = "quaternion_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Accelerometer => {
-            AccelerometerEvent::try_from(data).map(ControllerEvent::AccelerometerEvent)
+            #[cfg(feature = "accelerometer_event")]
+            return AccelerometerEvent::try_from(data).map(ControllerEvent::AccelerometerEvent);
+            #[cfg(not(feature = "accelerometer_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Gyro => {
-            GyroEvent::try_from(data).map(ControllerEvent::GyroEvent)
+            #[cfg(feature = "gyro_event")]
+            return GyroEvent::try_from(data).map(ControllerEvent::GyroEvent);
+            #[cfg(not(feature = "gyro_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Magnetometer => {
-            MagnetometerEvent::try_from(data).map(ControllerEvent::MagnetometerEvent)
+            #[cfg(feature = "magnetometer_event")]
+            return MagnetometerEvent::try_from(data).map(ControllerEvent::MagnetometerEvent);
+            #[cfg(not(feature = "magnetometer_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
         ControllerDataPackageType::Location => {
-            LocationEvent::try_from(data).map(ControllerEvent::LocationEvent)
+            #[cfg(feature = "location_event")]
+            return LocationEvent::try_from(data).map(ControllerEvent::LocationEvent);
+            #[cfg(not(feature = "location_event"))]
+            return Err(ProtocolParseError::DisabledControllerDataPackageType(
+                command,
+            ));
         }
-    }
+    };
 }
 
 /// Check the CRC of a command
@@ -228,6 +301,7 @@ fn check_crc(data: &[u8], crc: &u8) -> Result<(), ProtocolParseError> {
 }
 
 /// Small wrapper to convert the 4-byte value to an `f32` and handle the error.
+#[allow(unused)] // can be unused if no event which needs this has been selected as a feature.
 fn try_f32_from_le_bytes(input: &[u8]) -> Result<f32, ProtocolParseError> {
     Ok(f32::from_le_bytes(<[u8; 4]>::try_from(input).map_err(
         |_| ProtocolParseError::InvalidFloatSize(input.len()),
