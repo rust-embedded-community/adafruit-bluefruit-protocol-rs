@@ -6,7 +6,7 @@ edition = "2021"
 description = "A `no_std` parser for the Adafruit Bluefruit LE Connect controller protocol."
 repository = "https://github.com/rursprung/adafruit-bluefruit-protocol-rs"
 keywords = ["adafruit", "bluefruit", "protocol", "bluetooth", "embedded", "driver", "no_std"]
-license = "MIT"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 defmt = { version = "0.3", optional = true }
