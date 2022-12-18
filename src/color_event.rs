@@ -51,12 +51,12 @@ impl ColorEvent {
 }
 
 #[cfg(feature = "rgb")]
-impl Into<RGB8> for ColorEvent {
-    fn into(self) -> RGB8 {
+impl From<ColorEvent> for RGB8 {
+    fn from(val: ColorEvent) -> Self {
         RGB8 {
-            r: self.red,
-            g: self.green,
-            b: self.blue,
+            r: val.red,
+            g: val.green,
+            b: val.blue,
         }
     }
 }
