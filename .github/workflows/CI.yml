@@ -13,6 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        rust: [1.65.0, stable]
         features: ['', '--features rgb,serde']
 
     runs-on: ubuntu-latest
