@@ -13,7 +13,7 @@
 #![deny(warnings)]
 #![deny(missing_docs)]
 #![forbid(missing_debug_implementations)]
-// use deny instead of forbid due to bogus warnings, see also https://github.com/rust-lang/rust/issues/81670
+// use deny instead of forbid because try_f32_from_le_bytes might be unused depending on the selected features
 #![deny(unused)]
 #![no_std]
 
