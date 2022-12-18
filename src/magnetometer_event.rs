@@ -46,3 +46,20 @@ impl MagnetometerEvent {
         self.z
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::magnetometer_event::MagnetometerEvent;
+
+    #[test]
+    fn test_parse_gyro_event() {
+        let input: &[u8] = b"\xcd\xcc\x8bA\x00@\x03\xc2\x9a\x19\xcb\xc1";
+        let expected = MagnetometerEvent {
+            x: 17.475,
+            y: -32.8125,
+            z: -25.3875,
+        };
+
+        assert_eq!(MagnetometerEvent::try_from(input), Ok(expected));
+    }
+}

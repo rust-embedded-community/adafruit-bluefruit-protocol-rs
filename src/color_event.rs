@@ -59,3 +59,36 @@ impl Into<RGB8> for ColorEvent {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::color_event::ColorEvent;
+    #[cfg(feature = "rgb")]
+    use rgb::RGB8;
+
+    #[test]
+    fn test_parse_color_event() {
+        let input: &[u8] = b"\xff-9";
+        let expected = ColorEvent {
+            red: 255,
+            green: 45,
+            blue: 57,
+        };
+
+        assert_eq!(ColorEvent::try_from(input), Ok(expected));
+    }
+
+    #[test]
+    #[cfg(feature = "rgb")]
+    fn test_into_rgb8() {
+        let input = ColorEvent {
+            red: 1,
+            green: 2,
+            blue: 3,
+        };
+        let expected = RGB8 { r: 1, g: 2, b: 3 };
+
+        let result: RGB8 = input.into();
+        assert_eq!(result, expected);
+    }
+}

@@ -46,3 +46,20 @@ impl GyroEvent {
         self.z
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::gyro_event::GyroEvent;
+
+    #[test]
+    fn test_parse_gyro_event() {
+        let input: &[u8] = b"H.\xd7;\x0c\xb2\xe8<z\xe62\xbd";
+        let expected = GyroEvent {
+            x: 0.0065667965,
+            y: 0.028405212,
+            z: -0.04367683,
+        };
+
+        assert_eq!(GyroEvent::try_from(input), Ok(expected));
+    }
+}

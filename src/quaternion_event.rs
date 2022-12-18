@@ -52,3 +52,21 @@ impl QuaternionEvent {
         self.w
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::quaternion_event::QuaternionEvent;
+
+    #[test]
+    fn test_parse_quaternion_event() {
+        let input: &[u8] = b"9\x1e\x0c\xc03\xf7P\xbf\xefv\x96>\x00\x00\x00\x00";
+        let expected = QuaternionEvent {
+            x: -2.1893446,
+            y: -0.81627196,
+            z: 0.29387614,
+            w: 0.0,
+        };
+
+        assert_eq!(QuaternionEvent::try_from(input), Ok(expected));
+    }
+}

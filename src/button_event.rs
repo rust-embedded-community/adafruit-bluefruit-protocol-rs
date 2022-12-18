@@ -102,3 +102,135 @@ impl ButtonEvent {
         &self.state
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::button_event::{Button, ButtonEvent, ButtonParseError, ButtonState};
+    use crate::ProtocolParseError;
+
+    fn assert_is_button_event(
+        result: &Result<ButtonEvent, ProtocolParseError>,
+        button: Button,
+        button_state: ButtonState,
+    ) {
+        match result {
+            Ok(event) => {
+                assert_eq!(event.button(), &button);
+                assert_eq!(event.state(), &button_state)
+            }
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_parse_button1_pressed_event() {
+        let input: &[u8] = b"11";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Button1,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button1_released_event() {
+        let input: &[u8] = b"11";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Button1,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button2_pressed_event() {
+        let input: &[u8] = b"21";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Button2,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button3_pressed_event() {
+        let input: &[u8] = b"31";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Button3,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button4_pressed_event() {
+        let input: &[u8] = b"41";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Button4,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button_up_pressed_event() {
+        let input: &[u8] = b"51";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Up,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button_down_pressed_event() {
+        let input: &[u8] = b"61";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Down,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button_left_pressed_event() {
+        let input: &[u8] = b"71";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Left,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_button_right_pressed_event() {
+        let input: &[u8] = b"81";
+        assert_is_button_event(
+            &ButtonEvent::try_from(input),
+            Button::Right,
+            ButtonState::Pressed,
+        );
+    }
+
+    #[test]
+    fn test_parse_invalid_button() {
+        let input: &[u8] = b"01";
+        assert_eq!(
+            ButtonEvent::try_from(input),
+            Err(ProtocolParseError::ButtonParseError(
+                ButtonParseError::UnknownButton(b'0')
+            ))
+        );
+    }
+
+    #[test]
+    fn test_parse_invalid_button_state() {
+        let input: &[u8] = b"13";
+        assert_eq!(
+            ButtonEvent::try_from(input),
+            Err(ProtocolParseError::ButtonParseError(
+                ButtonParseError::UnknownButtonState(b'3')
+            ))
+        );
+    }
+}

@@ -46,3 +46,30 @@ impl LocationEvent {
         self.altitude
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::location_event::LocationEvent;
+
+    #[test]
+    fn test_parse_gyro_event() {
+        // as an exception this is not done using a real-world string received via bluetooth as I don't have a mock GPS app installed and don't want my real location in the source code :)
+        let expected_lat = 1.2f32;
+        let expected_lon = 2.3f32;
+        let expected_alt = 3.4f32;
+        let input = [
+            expected_lat.to_le_bytes(),
+            expected_lon.to_le_bytes(),
+            expected_alt.to_le_bytes(),
+        ]
+        .concat();
+
+        let expected = LocationEvent {
+            latitude: expected_lat,
+            longitude: expected_lon,
+            altitude: expected_alt,
+        };
+
+        assert_eq!(LocationEvent::try_from(input.as_slice()), Ok(expected));
+    }
+}

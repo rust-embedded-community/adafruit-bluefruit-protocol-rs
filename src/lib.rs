@@ -85,18 +85,22 @@ pub enum ControllerEvent {
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ProtocolParseError {
-    /// The message contained an event which is not known to the current implementation. This can either mean that the message was malformed or that a newer protocol version has been used.
+    /// The message contained an event which is not known to the current implementation.
+    /// This can mean that:
+    /// * the message was malformed or
+    /// * that a newer protocol version has been used or
+    /// * that the event type has not been enabled as a feature.
     UnknownEvent(Option<u8>),
     /// The message contained an event which is known to the library but has not been selected as a feature and can thus not be parsed. Select the feature when compiling the library to handle this message.
     DisabledControllerDataPackageType(ControllerDataPackageType),
     /// An error occurred while parsing a [`ButtonEvent`].
     #[cfg(feature = "button_event")]
     ButtonParseError(ButtonParseError),
-    /// The event in the message did not have the expected length.
+    /// The event in the message did not have the expected length. The first value is the expected length, the second the actual length.
     InvalidLength(usize, usize),
-    /// The event in the message did not have the expected CRC.
+    /// The event in the message did not have the expected CRC. The first value is the expected CRC, the second the actual CRC.
     InvalidCrc(u8, u16),
-    /// There was a problem parsing a float from a message.
+    /// There was a problem parsing a float from a message. The parameter gives the length of the received input.
     InvalidFloatSize(usize),
 }
 
@@ -306,4 +310,75 @@ fn try_f32_from_le_bytes(input: &[u8]) -> Result<f32, ProtocolParseError> {
     Ok(f32::from_le_bytes(<[u8; 4]>::try_from(input).map_err(
         |_| ProtocolParseError::InvalidFloatSize(input.len()),
     )?))
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::button_event::{Button, ButtonState};
+    use crate::{check_crc, parse, try_f32_from_le_bytes, ControllerEvent, ProtocolParseError};
+
+    fn assert_is_button_event(
+        event: &Result<ControllerEvent, ProtocolParseError>,
+        button: Button,
+        button_state: ButtonState,
+    ) {
+        match event {
+            Ok(ControllerEvent::ButtonEvent(event)) => {
+                assert_eq!(event.button(), &button);
+                assert_eq!(event.state(), &button_state)
+            }
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn test_parse() {
+        const MAX_RESULTS: usize = 4;
+        let input = b"\x00!B11:!B10;\x00\x00\x00\x00\x00\x00";
+        let result = parse::<MAX_RESULTS>(input);
+
+        assert_eq!(result.len(), 2);
+        assert_is_button_event(&result[0], Button::Button1, ButtonState::Pressed);
+        assert_is_button_event(&result[1], Button::Button1, ButtonState::Released);
+    }
+
+    #[test]
+    fn test_check_crc_ok() {
+        let input = b"!B11:";
+        let data = &input[0..input.len() - 1];
+        let crc = input.last().unwrap();
+
+        assert!(check_crc(data, &crc).is_ok());
+    }
+
+    #[test]
+    fn test_check_crc_err() {
+        let input = b"!B11;"; // should either be "!B11:" or "!B10;"
+        let correct_crc = b':';
+        let data = &input[0..input.len() - 1];
+        let crc = input.last().unwrap();
+
+        assert_eq!(
+            check_crc(data, &crc),
+            Err(ProtocolParseError::InvalidCrc(*crc, correct_crc as u16))
+        );
+    }
+
+    #[test]
+    fn test_try_f32_from_le_bytes_ok() {
+        let input = b"9\x1e\x0c\xc0";
+        let expected: f32 = -2.1893446;
+
+        assert_eq!(try_f32_from_le_bytes(input), Ok(expected));
+    }
+
+    #[test]
+    fn test_try_f32_from_le_bytes_err() {
+        let input = b"\x1e\x0c\xc0";
+
+        assert_eq!(
+            try_f32_from_le_bytes(input),
+            Err(ProtocolParseError::InvalidFloatSize(3))
+        );
+    }
 }
