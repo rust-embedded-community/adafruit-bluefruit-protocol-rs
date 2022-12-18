@@ -47,6 +47,7 @@ impl Button {
 /// The state of the button.
 #[derive(PartialEq, Eq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub enum ButtonState {
     Released,

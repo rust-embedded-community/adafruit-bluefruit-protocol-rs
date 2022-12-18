@@ -5,6 +5,7 @@ use super::{try_f32_from_le_bytes, ProtocolParseError};
 /// Represents a magnetometer event from the protocol.
 #[derive(PartialEq, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub struct MagnetometerEvent {
     x: f32,

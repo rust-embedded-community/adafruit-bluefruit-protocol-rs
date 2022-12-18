@@ -4,6 +4,7 @@
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 //! * `rgb`: if enabled, the `ColorEvent` implements `Into<RGB8>` for the [RGB crate](https://crates.io/crates/rgb).
+//! * `serde`: if enabled, all events implement the [serde](https://serde.rs/) `#[derive(Serialize, Deserialize)]`.
 //! * All events can be selected as individual features. By default, they are all selected,
 //!   but you can opt to only select the event(s) you are interested in which will result in a small binary size.
 //!   If other events are received, a [`ProtocolParseError::DisabledControllerDataPackageType`] will be returned.

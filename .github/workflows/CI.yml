@@ -10,20 +10,26 @@ env:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        features: ['', '--features rgb,serde']
 
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/cargo@v1
         with:
           command: build
+          args: ${{ matrix.features }}
       - uses: actions-rs/cargo@v1
         with:
           command: check
+          args: ${{ matrix.features }}
       - uses: actions-rs/cargo@v1
         with:
           command: test
+          args: ${{ matrix.features }}
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -31,6 +37,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
+          args: ${{ matrix.features }}
       - uses: actions-rs/cargo@v1
         with:
           command: audit

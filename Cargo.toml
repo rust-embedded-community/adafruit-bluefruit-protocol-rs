@@ -11,7 +11,9 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 defmt = { version = "0.3", optional = true }
 heapless = { version = "0.7" }
+
 rgb = { version = "0.8", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
 
 [features]
 default = ["accelerometer_event", "button_event", "color_event", "gyro_event", "location_event", "magnetometer_event", "quaternion_event"]
