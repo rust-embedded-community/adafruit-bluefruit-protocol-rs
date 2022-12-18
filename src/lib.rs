@@ -335,12 +335,13 @@ mod tests {
     #[test]
     fn test_parse() {
         const MAX_RESULTS: usize = 4;
-        let input = b"\x00!B11:!B10;\x00\x00\x00\x00\x00\x00";
+        let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00";
         let result = parse::<MAX_RESULTS>(input);
 
-        assert_eq!(result.len(), 2);
+        assert_eq!(result.len(), 3);
         assert_is_button_event(&result[0], Button::Button1, ButtonState::Pressed);
         assert_is_button_event(&result[1], Button::Button1, ButtonState::Released);
+        assert_eq!(result[2], Err(ProtocolParseError::UnknownEvent(Some(0))));
     }
 
     #[test]
