@@ -17,6 +17,6 @@ Note that this work is not affiliated with Adafruit.
   but you can opt to only select the event(s) you are interested in which will result in a small binary size.
   If other events are received, a `ProtocolParseError::DisabledControllerDataPackageType` will be returned.
 
-## Build-time Requirements
-The crate is tested against stable rust and rust 1.65.0 (which was the stable version at the time the crate has been built).
-It is possible that it works with older versions as well but this is not tested.
+## Minimum Supported Rust Version (MSRV)
+This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
+compile with older versions but that may change in any new patch release.
