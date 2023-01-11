@@ -5,11 +5,8 @@ on:
     branches: [ "master" ]
   pull_request:
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
-  build:
+  lib:
     strategy:
       fail-fast: false
       matrix:
@@ -35,3 +32,31 @@ jobs:
         run: cargo clippy ${{ matrix.features }}
       - name: audit
         run: cargo audit
+
+  stm32f4-event-printer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabihf
+          components: rustfmt clippy
+      - name: Install flip-link
+        run: cargo install flip-link
+      - name: build
+        run: cargo build
+        working-directory: examples/stm32f4-event-printer
+      - name: check
+        run: cargo check
+        working-directory: examples/stm32f4-event-printer
+      # no tests available for now => no test step as it'd fail otherwise
+      - name: check formatting
+        run: cargo fmt --all -- --check
+        working-directory: examples/stm32f4-event-printer
+      - name: clippy
+        run: cargo clippy
+        working-directory: examples/stm32f4-event-printer
+      - name: audit
+        run: cargo audit
+        working-directory: examples/stm32f4-event-printer

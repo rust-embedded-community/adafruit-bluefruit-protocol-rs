@@ -17,6 +17,9 @@ Note that this work is not affiliated with Adafruit.
   but you can opt to only select the event(s) you are interested in which will result in a small binary size.
   If other events are received, a `ProtocolParseError::DisabledControllerDataPackageType` will be returned.
 
+## Examples
+A simple example for the STM32F4 microcontrollers is [available](examples/stm32f4-event-printer/README.md).
+
 ## Changelog
 For the changelog please see the dedicated [CHANGELOG.md](CHANGELOG.md).
 

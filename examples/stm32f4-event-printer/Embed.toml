@@ -1,0 +1,2 @@
+[default.general]
+chip = "STM32F401RE"

@@ -1,0 +1,25 @@
+[package]
+name = "stm32f4-event-printer"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+cortex-m = { version = "0.7", features = ["critical-section-single-core"]}
+cortex-m-rtic = "1.1.3"
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+
+stm32f4xx-hal = { version = "0.14", features = ["stm32f401", "rtic", "rtic-monotonic"] }
+
+fugit = "0.3"
+
+defmt = "0.3.2"
+defmt-rtt = "0.4"
+
+# use `adafruit-bluefruit-protocol = "0.1"` in reality; path used here to ensure that the example always compiles against the latest master
+adafruit-bluefruit-protocol = { path = "../..", features = ["defmt"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
