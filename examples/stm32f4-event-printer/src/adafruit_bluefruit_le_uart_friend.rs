@@ -84,6 +84,7 @@ impl BluefruitLEUARTFriend {
         defmt::info!("received event(s) over bluetooth: {}", &event);
 
         // switch out the buffers
+        filled_buffer.fill(0);
         self.rx_buffer = Some(filled_buffer);
 
         self.rx_transfer.clear_idle_interrupt();
