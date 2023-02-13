@@ -6,7 +6,7 @@ rust-version = "1.60"
 
 description = "A `no_std` parser for the Adafruit Bluefruit LE Connect controller protocol."
 repository = "https://github.com/rursprung/adafruit-bluefruit-protocol-rs"
-categories = ["embedded", "hardware-support", "no-std"]
+categories = ["embedded", "hardware-support", "no-std", "no-std::no-alloc"]
 keywords = ["adafruit", "bluefruit", "bluetooth", "protocol"]
 license = "MIT OR Apache-2.0"
 
