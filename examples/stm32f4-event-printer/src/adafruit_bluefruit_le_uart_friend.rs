@@ -2,7 +2,7 @@ use stm32f4xx_hal::dma::config::DmaConfig;
 use stm32f4xx_hal::dma::{PeripheralToMemory, Stream2, StreamsTuple, Transfer};
 use stm32f4xx_hal::gpio::{PA10, PB6};
 use stm32f4xx_hal::pac::{DMA2, USART1};
-use stm32f4xx_hal::prelude::_stm32f4xx_hal_time_U32Ext;
+use stm32f4xx_hal::prelude::*;
 use stm32f4xx_hal::rcc::Clocks;
 use stm32f4xx_hal::serial;
 use stm32f4xx_hal::serial::{Rx, Serial};
