@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         rust: [1.62.0, stable]
-        features: ['', '--all-features']
+        features: ['use_alloc', 'use_alloc,defmt', 'use_heapless', 'use_heapless,defmt']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,15 +21,15 @@ jobs:
           toolchain: ${{ matrix.rust }}
           components: rustfmt clippy
       - name: build
-        run: cargo build ${{ matrix.features }}
+        run: cargo build --features ${{ matrix.features }}
       - name: check
-        run: cargo check ${{ matrix.features }}
+        run: cargo check --features ${{ matrix.features }}
       - name: test
-        run: cargo test ${{ matrix.features }}
+        run: cargo test --features ${{ matrix.features }}
       - name: check formatting
         run: cargo fmt --all -- --check
       - name: clippy
-        run: cargo clippy ${{ matrix.features }}
+        run: cargo clippy --features ${{ matrix.features }}
       - name: audit
         run: cargo audit
 

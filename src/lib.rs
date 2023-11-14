@@ -29,6 +29,12 @@
 )))]
 compile_error!("at least one event type must be selected in the features!");
 
+#[cfg(not(any(feature = "use_alloc", feature = "use_heapless")))]
+compile_error!("you must choose either 'use_alloc' or 'use_heapless' as a feature!");
+
+#[cfg(all(feature = "use_alloc", feature = "use_heapless"))]
+compile_error!("you must choose either 'use_alloc' or 'use_heapless' as a feature but not both!");
+
 #[cfg(feature = "accelerometer_event")]
 pub mod accelerometer_event;
 #[cfg(feature = "button_event")]
@@ -53,7 +59,13 @@ use color_event::ColorEvent;
 use core::cmp::min;
 #[cfg(feature = "gyro_event")]
 use gyro_event::GyroEvent;
+#[cfg(feature = "use_heapless")]
 use heapless::Vec;
+
+#[cfg(feature = "use_alloc")]
+extern crate alloc;
+#[cfg(feature = "use_alloc")]
+use alloc::vec::Vec;
 #[cfg(feature = "location_event")]
 use location_event::LocationEvent;
 #[cfg(feature = "magnetometer_event")]
@@ -156,10 +168,19 @@ impl TryFrom<u8> for ControllerDataPackageType {
     }
 }
 
+#[cfg(feature = "use_heapless")]
+type ParseResult<const MAX_RESULTS: usize> =
+    Vec<Result<ControllerEvent, ProtocolParseError>, MAX_RESULTS>;
+
+#[cfg(feature = "use_alloc")]
+type ParseResult<const MAX_RESULTS: usize> = Vec<Result<ControllerEvent, ProtocolParseError>>;
+#[cfg(feature = "use_alloc")]
+const MAX_RESULTS: usize = 0;
+
 /// Parse the input string for commands. Unexpected content will be ignored if it's not formatted like a command!
-pub fn parse<const MAX_RESULTS: usize>(
+pub fn parse<#[cfg(feature = "use_heapless")] const MAX_RESULTS: usize>(
     input: &[u8],
-) -> Vec<Result<ControllerEvent, ProtocolParseError>, MAX_RESULTS> {
+) -> ParseResult<MAX_RESULTS> {
     /// Simple state machine for the parser, represents whether the parser is seeking a start or has found it.
     enum ParserState {
         SeekStart,
@@ -167,7 +188,7 @@ pub fn parse<const MAX_RESULTS: usize>(
     }
     let mut state = ParserState::SeekStart;
 
-    let mut result: Vec<Result<ControllerEvent, ProtocolParseError>, MAX_RESULTS> = Vec::new();
+    let mut result = Vec::new();
 
     for pos in 0..input.len() {
         let byte = input[pos];
@@ -179,7 +200,11 @@ pub fn parse<const MAX_RESULTS: usize>(
             }
             ParserState::ParseCommand => {
                 let data_package = extract_and_parse_command(&input[(pos - 1)..]);
+                #[cfg(feature = "use_alloc")]
+                result.push(data_package);
+                #[cfg(feature = "use_heapless")]
                 result.push(data_package).ok();
+                #[cfg(feature = "use_heapless")]
                 if result.len() == MAX_RESULTS {
                     return result;
                 }
@@ -334,9 +359,11 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        const MAX_RESULTS: usize = 4;
         let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00";
-        let result = parse::<MAX_RESULTS>(input);
+        #[cfg(feature = "use_heapless")]
+        let result = parse::<4>(input);
+        #[cfg(feature = "use_alloc")]
+        let result = parse(input);
 
         assert_eq!(result.len(), 3);
         assert_is_button_event(&result[0], Button::Button1, ButtonState::Pressed);
