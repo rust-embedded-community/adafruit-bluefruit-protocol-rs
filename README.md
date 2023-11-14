@@ -9,7 +9,13 @@ which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adaf
 
 Note that this work is not affiliated with Adafruit.
 
-## Optional features
+## Mandatory Features
+This crate is `no_std` and you can choose whether you want to use
+[`heapless::Vec`](https://docs.rs/heapless/0.8.0/heapless/struct.Vec.html) by selecting the feature `use_heapless` or
+[`alloc::vec::Vec`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html) by selecting the feature `use_alloc`.
+If you select neither or both you'll get a compile error.
+
+## Optional Features
 * `defmt`: you can enable the [`defmt`](https://defmt.ferrous-systems.com/) feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 * `rgb`: if enabled, `From<ColorEvent> for RGB8` is implemented to support the [RGB crate](https://crates.io/crates/rgb).
 * `serde`: if enabled, all events implement the [serde](https://serde.rs/) `#[derive(Serialize, Deserialize)]`.
