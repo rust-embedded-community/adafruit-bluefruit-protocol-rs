@@ -71,6 +71,10 @@ impl BluefruitLEUARTFriend {
     }
 
     pub fn handle_bluetooth_message(&mut self) {
+        if !self.rx_transfer.is_transfer_complete() {
+            return;
+        }
+
         let (filled_buffer, _) = self
             .rx_transfer
             .next_transfer(self.rx_buffer.take().unwrap())

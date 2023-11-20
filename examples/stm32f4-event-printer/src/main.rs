@@ -15,11 +15,7 @@ mod adafruit_bluefruit_le_uart_friend;
 #[rtic::app(device = stm32f4xx_hal::pac, dispatchers = [EXTI1])]
 mod app {
     use crate::adafruit_bluefruit_le_uart_friend::BluefruitLEUARTFriend;
-    use stm32f4xx_hal::dma::Stream2;
-    use stm32f4xx_hal::{
-        dma::traits::StreamISR, pac, pac::DMA2, prelude::*, timer::MonoTimerUs,
-        watchdog::IndependentWatchdog,
-    };
+    use stm32f4xx_hal::{pac, prelude::*, timer::MonoTimerUs, watchdog::IndependentWatchdog};
 
     #[monotonic(binds = TIM2, default = true)]
     type MicrosecMono = MonoTimerUs<pac::TIM2>;
@@ -77,11 +73,9 @@ mod app {
     #[task(binds = DMA2_STREAM2, shared = [bt_module])]
     fn bluetooth_dma_interrupt(mut ctx: bluetooth_dma_interrupt::Context) {
         defmt::debug!("received DMA2_STREAM2 interrupt (transfer complete)");
-        if Stream2::<DMA2>::get_transfer_complete_flag() {
-            ctx.shared.bt_module.lock(|bt_module| {
-                bt_module.handle_bluetooth_message();
-            });
-        }
+        ctx.shared.bt_module.lock(|bt_module| {
+            bt_module.handle_bluetooth_message();
+        });
     }
 
     #[task(binds = USART1, shared = [bt_module])]
