@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  security-events: write # needed to upload SARIF reports on branch builds
+
 on:
   push:
     branches: [ "master" ]
@@ -20,6 +23,8 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           components: rustfmt clippy
+      - name: Install required cargo components
+        run: cargo +stable install clippy-sarif sarif-fmt
       - name: build
         run: cargo build --features ${{ matrix.features }}
       - name: check
@@ -28,10 +33,16 @@ jobs:
         run: cargo test --features ${{ matrix.features }}
       - name: check formatting
         run: cargo fmt --all -- --check
-      - name: clippy
-        run: cargo clippy --features ${{ matrix.features }}
       - name: audit
         run: cargo audit
+      - name: clippy (lib)
+        run: cargo clippy --features ${{ matrix.features }} --message-format=json | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
+        continue-on-error: true
+      - name: Upload analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: rust-clippy-results.sarif
+          wait-for-processing: true
 
   stm32f4-event-printer:
     runs-on: ubuntu-latest
@@ -42,8 +53,8 @@ jobs:
         with:
           targets: thumbv7em-none-eabihf
           components: rustfmt clippy
-      - name: Install flip-link
-        run: cargo install flip-link
+      - name: Install required cargo components
+        run: cargo install clippy-sarif sarif-fmt flip-link
       - name: build
         run: cargo build
         working-directory: examples/stm32f4-event-printer
@@ -54,9 +65,20 @@ jobs:
       - name: check formatting
         run: cargo fmt --all -- --check
         working-directory: examples/stm32f4-event-printer
-      - name: clippy
-        run: cargo clippy
-        working-directory: examples/stm32f4-event-printer
       - name: audit
         run: cargo audit
         working-directory: examples/stm32f4-event-printer
+      - name: clippy (example)
+        # see the following comment for the patching workaround: https://github.com/psastras/sarif-rs/issues/370#issuecomment-1475364427
+        run: |
+          cargo clippy --message-format=json | \
+          clippy-sarif | \
+          jq --arg pwd "examples/stm32f4-event-printer" '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= $pwd + "/" + .' | \
+          tee rust-clippy-results.sarif | \
+          sarif-fmt
+        working-directory: examples/stm32f4-event-printer
+      - name: Upload analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: examples/stm32f4-event-printer/rust-clippy-results.sarif
+          wait-for-processing: true
