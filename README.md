@@ -1,5 +1,5 @@
 # Adafruit Bluefruit LE Connect Controller Protocol Parser
-[![CI](https://github.com/rursprung/adafruit-bluefruit-protocol-rs/actions/workflows/CI.yml/badge.svg)](https://github.com/rursprung/adafruit-bluefruit-protocol-rs/actions/workflows/CI.yml)
+[![CI](https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/actions/workflows/CI.yml/badge.svg)](https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/actions/workflows/CI.yml)
 [![Crates.io](https://img.shields.io/crates/v/adafruit-bluefruit-protocol)](https://crates.io/crates/adafruit-bluefruit-protocol)
 ![Licenses](https://img.shields.io/crates/l/adafruit-bluefruit-protocol)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
