@@ -1,6 +1,8 @@
 //! Implements the [`ButtonEvent`] and its parsing from the protocol.
 
 use super::ProtocolParseError;
+use core::error::Error;
+use core::fmt::{Display, Formatter};
 
 /// Errors which can be raised while parsing a button event.
 #[derive(PartialEq, Eq, Debug)]
@@ -11,6 +13,18 @@ pub enum ButtonParseError {
     /// The message contained an unknown button state. For the known button states see [`ButtonState`].
     UnknownButtonState(u8),
 }
+
+impl Display for ButtonParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        use ButtonParseError::*;
+        match self {
+            UnknownButton(button) => write!(f, "Unknown button: {:#x}", button),
+            UnknownButtonState(state) => write!(f, "Unknown button state: {:#x}", state),
+        }
+    }
+}
+
+impl Error for ButtonParseError {}
 
 /// Lists all possible buttons which can be sent in the event.
 #[derive(PartialEq, Eq, Debug)]

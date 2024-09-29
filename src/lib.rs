@@ -66,6 +66,8 @@ use heapless::Vec;
 extern crate alloc;
 #[cfg(feature = "use_alloc")]
 use alloc::vec::Vec;
+use core::error::Error;
+use core::fmt::{Display, Formatter};
 #[cfg(feature = "location_event")]
 use location_event::LocationEvent;
 #[cfg(feature = "magnetometer_event")]
@@ -101,8 +103,7 @@ pub enum ProtocolParseError {
     /// The message contained an event which is not known to the current implementation.
     /// This can mean that:
     /// * the message was malformed or
-    /// * that a newer protocol version has been used or
-    /// * that the event type has not been enabled as a feature.
+    /// * that a newer protocol version has been used.
     UnknownEvent(Option<u8>),
     /// The message contained an event which is known to the library but has not been selected as a feature and can thus not be parsed. Select the feature when compiling the library to handle this message.
     DisabledControllerDataPackageType(ControllerDataPackageType),
@@ -115,6 +116,44 @@ pub enum ProtocolParseError {
     InvalidCrc(u8, u16),
     /// There was a problem parsing a float from a message. The parameter gives the length of the received input.
     InvalidFloatSize(usize),
+}
+
+impl Display for ProtocolParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        use ProtocolParseError::*;
+        match self {
+            UnknownEvent(event) => write!(f, "Unknown event type: {:?}", event),
+            DisabledControllerDataPackageType(event) => {
+                write!(f, "Disabled event type: {:?}", event)
+            }
+            ButtonParseError(_) => write!(f, "Error while parsing button event"),
+            InvalidLength(expected, actual) => write!(
+                f,
+                "Invalid message length: expected {} but received {}",
+                expected, actual
+            ),
+            InvalidCrc(expected, actual) => write!(
+                f,
+                "Invalid CRC: expected {:#x} but calculated {:#x}",
+                expected, actual
+            ),
+            InvalidFloatSize(length) => write!(
+                f,
+                "Failed to parse float from a message with size {}",
+                length
+            ),
+        }
+    }
+}
+
+impl Error for ProtocolParseError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        use ProtocolParseError::*;
+        match self {
+            ButtonParseError(e) => Some(e),
+            _ => None,
+        }
+    }
 }
 
 /// Lists all data packages which can be sent by the controller. Internal state used during parsing. Use [`ControllerEvent`] to return the actual event.
@@ -340,7 +379,7 @@ fn try_f32_from_le_bytes(input: &[u8]) -> Result<f32, ProtocolParseError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::button_event::{Button, ButtonState};
+    use crate::button_event::{Button, ButtonParseError, ButtonState};
     use crate::{check_crc, parse, try_f32_from_le_bytes, ControllerEvent, ProtocolParseError};
 
     fn assert_is_button_event(
@@ -359,16 +398,33 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00";
+        let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00!B138";
         #[cfg(feature = "use_heapless")]
         let result = parse::<4>(input);
         #[cfg(feature = "use_alloc")]
         let result = parse(input);
 
-        assert_eq!(result.len(), 3);
+        assert_eq!(result.len(), 4);
         assert_is_button_event(&result[0], Button::Button1, ButtonState::Pressed);
         assert_is_button_event(&result[1], Button::Button1, ButtonState::Released);
         assert_eq!(result[2], Err(ProtocolParseError::UnknownEvent(Some(0))));
+        if let Err(e) = &result[3] {
+            assert_eq!(
+                e,
+                &ProtocolParseError::ButtonParseError(ButtonParseError::UnknownButtonState(b'3'))
+            );
+            #[cfg(feature = "use_alloc")]
+            {
+                use alloc::string::ToString;
+                use core::error::Error;
+                assert_eq!(
+                    e.source().unwrap().to_string(),
+                    "Unknown button state: 0x33"
+                );
+            }
+        } else {
+            assert!(false, "expected an error");
+        }
     }
 
     #[test]

@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [1.62.0, stable]
+        rust: [1.81.0, stable]
         features: ['use_alloc', 'use_alloc,defmt', 'use_heapless', 'use_heapless,defmt']
         exclude:
-          - rust: 1.62.0
+          - rust: 1.81.0
             features: 'use_alloc,defmt'
-          - rust: 1.62.0
+          - rust: 1.81.0
             features: 'use_heapless,defmt'
     runs-on: ubuntu-latest
     steps:

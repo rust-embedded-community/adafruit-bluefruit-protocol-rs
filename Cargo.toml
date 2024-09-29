@@ -2,7 +2,7 @@
 name = "adafruit-bluefruit-protocol"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.62"
+rust-version = "1.81"
 
 description = "A `no_std` parser for the Adafruit Bluefruit LE Connect controller protocol."
 repository = "https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs"
