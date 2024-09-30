@@ -3,7 +3,7 @@
 use super::{try_f32_from_le_bytes, ProtocolParseError};
 
 /// Represents a location event from the protocol.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[allow(missing_docs)] // the names are already obvious enough

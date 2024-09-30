@@ -76,7 +76,7 @@ use magnetometer_event::MagnetometerEvent;
 use quaternion_event::QuaternionEvent;
 
 /// Lists all (supported) events which can be sent by the controller. These come with the parsed event data and are the result of a [`parse`] call.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub enum ControllerEvent {
@@ -97,7 +97,7 @@ pub enum ControllerEvent {
 }
 
 /// Represents the different kinds of errors which can happen when the protocol is being parsed.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ProtocolParseError {
     /// The message contained an event which is not known to the current implementation.
@@ -157,7 +157,7 @@ impl Error for ProtocolParseError {
 }
 
 /// Lists all data packages which can be sent by the controller. Internal state used during parsing. Use [`ControllerEvent`] to return the actual event.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub enum ControllerDataPackageType {

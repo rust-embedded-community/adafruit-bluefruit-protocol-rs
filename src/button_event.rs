@@ -5,7 +5,7 @@ use core::error::Error;
 use core::fmt::{Display, Formatter};
 
 /// Errors which can be raised while parsing a button event.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Hash, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ButtonParseError {
     /// The message contained an unknown button. For the known buttons see [`Button`].
@@ -27,7 +27,7 @@ impl Display for ButtonParseError {
 impl Error for ButtonParseError {}
 
 /// Lists all possible buttons which can be sent in the event.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub enum Button {
@@ -59,7 +59,7 @@ impl Button {
 }
 
 /// The state of the button.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[allow(missing_docs)] // the names are already obvious enough
@@ -80,7 +80,7 @@ impl ButtonState {
 }
 
 /// Represents a button event from the protocol.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
 pub struct ButtonEvent {
