@@ -24,7 +24,8 @@ If you select neither or both you'll get a compile error.
   If other events are received, a `ProtocolParseError::DisabledControllerDataPackageType` will be returned.
 
 ## Usage
-The entry point to use this crate is the `parse` function.
+The entry point to use this crate is the `parse` function. Note that this is a [sans I/O](https://sans-io.readthedocs.io/)
+crate, i.e. you have to talk to the Adafruit device, the `parse` function just expects a byte sequence.
 
 ## Examples
 A simple example for the STM32F4 microcontrollers is [available](examples/stm32f4-event-printer/README.md).

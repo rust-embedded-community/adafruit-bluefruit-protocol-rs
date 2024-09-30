@@ -1,7 +1,8 @@
 //! This implements the [Adafruit Bluefruit LE Connect controller protocol](https://learn.adafruit.com/bluefruit-le-connect/controller)
 //! which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-uart-friend).
 //!
-//! The entry point to use this crate is the [`parse`] function.
+//! The entry point to use this crate is the [`parse`] function. Note that this is a [sans I/O](https://sans-io.readthedocs.io/)
+//! crate, i.e. you have to talk to the Adafruit device, the `parse` function just expects a byte sequence.
 //!
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
