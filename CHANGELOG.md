@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - ReleaseDate
 ### Changed
 * The MSRV has been updated to 1.81.0 due to `core::error::Error` being implemented
+* **BREAKING**: the features `use_alloc` and `use_heapless` have been renamed to `alloc` and `heapless` respectively.
 
 ## [0.2.0] - 2023-11-14
 ### Added

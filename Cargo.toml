@@ -20,8 +20,8 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 [features]
 default = ["accelerometer_event", "button_event", "color_event", "gyro_event", "location_event", "magnetometer_event", "quaternion_event"]
 
-use_heapless = ["dep:heapless"]
-use_alloc = []
+heapless = ["dep:heapless"]
+alloc = []
 
 defmt = ["dep:defmt", "heapless?/defmt-03"]
 

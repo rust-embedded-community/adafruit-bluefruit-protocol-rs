@@ -11,8 +11,8 @@ Note that this work is not affiliated with Adafruit.
 
 ## Mandatory Features
 This crate is `no_std` and you can choose whether you want to use
-[`heapless::Vec`](https://docs.rs/heapless/0.8.0/heapless/struct.Vec.html) by selecting the feature `use_heapless` or
-[`alloc::vec::Vec`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html) by selecting the feature `use_alloc`.
+[`heapless::Vec`](https://docs.rs/heapless/0.8.0/heapless/struct.Vec.html) by selecting the feature `heapless` or
+[`alloc::vec::Vec`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html) by selecting the feature `alloc`.
 If you select neither or both you'll get a compile error.
 
 ## Optional Features

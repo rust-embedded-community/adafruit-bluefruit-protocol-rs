@@ -29,11 +29,11 @@
 )))]
 compile_error!("at least one event type must be selected in the features!");
 
-#[cfg(not(any(feature = "use_alloc", feature = "use_heapless")))]
-compile_error!("you must choose either 'use_alloc' or 'use_heapless' as a feature!");
+#[cfg(not(any(feature = "alloc", feature = "heapless")))]
+compile_error!("you must choose either 'alloc' or 'heapless' as a feature!");
 
-#[cfg(all(feature = "use_alloc", feature = "use_heapless"))]
-compile_error!("you must choose either 'use_alloc' or 'use_heapless' as a feature but not both!");
+#[cfg(all(feature = "alloc", feature = "heapless"))]
+compile_error!("you must choose either 'alloc' or 'heapless' as a feature but not both!");
 
 #[cfg(feature = "accelerometer_event")]
 pub mod accelerometer_event;
@@ -59,12 +59,12 @@ use color_event::ColorEvent;
 use core::cmp::min;
 #[cfg(feature = "gyro_event")]
 use gyro_event::GyroEvent;
-#[cfg(feature = "use_heapless")]
+#[cfg(feature = "heapless")]
 use heapless::Vec;
 
-#[cfg(feature = "use_alloc")]
+#[cfg(feature = "alloc")]
 extern crate alloc;
-#[cfg(feature = "use_alloc")]
+#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 use core::error::Error;
 use core::fmt::{Display, Formatter};
@@ -207,17 +207,17 @@ impl TryFrom<u8> for ControllerDataPackageType {
     }
 }
 
-#[cfg(feature = "use_heapless")]
+#[cfg(feature = "heapless")]
 type ParseResult<const MAX_RESULTS: usize> =
     Vec<Result<ControllerEvent, ProtocolParseError>, MAX_RESULTS>;
 
-#[cfg(feature = "use_alloc")]
+#[cfg(feature = "alloc")]
 type ParseResult<const MAX_RESULTS: usize> = Vec<Result<ControllerEvent, ProtocolParseError>>;
-#[cfg(feature = "use_alloc")]
+#[cfg(feature = "alloc")]
 const MAX_RESULTS: usize = 0;
 
 /// Parse the input string for commands. Unexpected content will be ignored if it's not formatted like a command!
-pub fn parse<#[cfg(feature = "use_heapless")] const MAX_RESULTS: usize>(
+pub fn parse<#[cfg(feature = "heapless")] const MAX_RESULTS: usize>(
     input: &[u8],
 ) -> ParseResult<MAX_RESULTS> {
     /// Simple state machine for the parser, represents whether the parser is seeking a start or has found it.
@@ -239,11 +239,11 @@ pub fn parse<#[cfg(feature = "use_heapless")] const MAX_RESULTS: usize>(
             }
             ParserState::ParseCommand => {
                 let data_package = extract_and_parse_command(&input[(pos - 1)..]);
-                #[cfg(feature = "use_alloc")]
+                #[cfg(feature = "alloc")]
                 result.push(data_package);
-                #[cfg(feature = "use_heapless")]
+                #[cfg(feature = "heapless")]
                 result.push(data_package).ok();
-                #[cfg(feature = "use_heapless")]
+                #[cfg(feature = "heapless")]
                 if result.len() == MAX_RESULTS {
                     return result;
                 }
@@ -399,9 +399,9 @@ mod tests {
     #[test]
     fn test_parse() {
         let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00!B138";
-        #[cfg(feature = "use_heapless")]
+        #[cfg(feature = "heapless")]
         let result = parse::<4>(input);
-        #[cfg(feature = "use_alloc")]
+        #[cfg(feature = "alloc")]
         let result = parse(input);
 
         assert_eq!(result.len(), 4);
@@ -413,7 +413,7 @@ mod tests {
                 e,
                 &ProtocolParseError::ButtonParseError(ButtonParseError::UnknownButtonState(b'3'))
             );
-            #[cfg(feature = "use_alloc")]
+            #[cfg(feature = "alloc")]
             {
                 use alloc::string::ToString;
                 use core::error::Error;

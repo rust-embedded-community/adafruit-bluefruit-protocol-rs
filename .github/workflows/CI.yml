@@ -14,12 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         rust: [1.81.0, stable]
-        features: ['use_alloc', 'use_alloc,defmt', 'use_heapless', 'use_heapless,defmt']
+        features: ['alloc', 'alloc,defmt', 'heapless', 'heapless,defmt']
         exclude:
           - rust: 1.81.0
-            features: 'use_alloc,defmt'
+            features: 'alloc,defmt'
           - rust: 1.81.0
-            features: 'use_heapless,defmt'
+            features: 'heapless,defmt'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
