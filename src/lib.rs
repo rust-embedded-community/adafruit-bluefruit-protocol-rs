@@ -1,6 +1,8 @@
 //! This implements the [Adafruit Bluefruit LE Connect controller protocol](https://learn.adafruit.com/bluefruit-le-connect/controller)
 //! which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-uart-friend).
 //!
+//! The entry point to use this crate is the [`parse`] function.
+//!
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 //! * `rgb`: if enabled, `From<ColorEvent> for RGB8` is implemented to support the [RGB crate](https://crates.io/crates/rgb).

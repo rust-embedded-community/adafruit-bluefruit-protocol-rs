@@ -23,6 +23,9 @@ If you select neither or both you'll get a compile error.
   but you can opt to only select the event(s) you are interested in which will result in a small binary size.
   If other events are received, a `ProtocolParseError::DisabledControllerDataPackageType` will be returned.
 
+## Usage
+The entry point to use this crate is the `parse` function.
+
 ## Examples
 A simple example for the STM32F4 microcontrollers is [available](examples/stm32f4-event-printer/README.md).
 
