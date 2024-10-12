@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `Copy`, `Clone` and `Hash` on error & event types (where possible)
 ### Changed
 * The MSRV has been updated to 1.81.0 due to `core::error::Error` being implemented
-* **BREAKING**: the features `use_alloc` and `use_heapless` have been renamed to `alloc` and `heapless` respectively.
+* **BREAKING**: The `parse` API has been replaced with `Parser::new` where `Parser` now implements `Iterator` and the `next` function returns each parsed command
+  * Accordingly, the features `use_alloc` and `use_heapless` have been removed.
 
 ## [0.2.0] - 2023-11-14
 ### Added

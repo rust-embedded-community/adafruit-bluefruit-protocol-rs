@@ -1,8 +1,8 @@
 //! This implements the [Adafruit Bluefruit LE Connect controller protocol](https://learn.adafruit.com/bluefruit-le-connect/controller)
 //! which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-uart-friend).
 //!
-//! The entry point to use this crate is the [`parse`] function. Note that this is a [sans I/O](https://sans-io.readthedocs.io/)
-//! crate, i.e. you have to talk to the Adafruit device, the `parse` function just expects a byte sequence.
+//! The entry point to use this crate is [`Parser`]. Note that this is a [sans I/O](https://sans-io.readthedocs.io/)
+//! crate, i.e. you have to talk to the Adafruit device, the parser just expects a byte sequence.
 //!
 //! ## Optional features
 //! * `defmt`: you can enable the `defmt` feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
@@ -32,12 +32,6 @@
 )))]
 compile_error!("at least one event type must be selected in the features!");
 
-#[cfg(not(any(feature = "alloc", feature = "heapless")))]
-compile_error!("you must choose either 'alloc' or 'heapless' as a feature!");
-
-#[cfg(all(feature = "alloc", feature = "heapless"))]
-compile_error!("you must choose either 'alloc' or 'heapless' as a feature but not both!");
-
 #[cfg(feature = "accelerometer_event")]
 pub mod accelerometer_event;
 #[cfg(feature = "button_event")]
@@ -62,13 +56,7 @@ use color_event::ColorEvent;
 use core::cmp::min;
 #[cfg(feature = "gyro_event")]
 use gyro_event::GyroEvent;
-#[cfg(feature = "heapless")]
-use heapless::Vec;
 
-#[cfg(feature = "alloc")]
-extern crate alloc;
-#[cfg(feature = "alloc")]
-use alloc::vec::Vec;
 use core::error::Error;
 use core::fmt::{Display, Formatter};
 #[cfg(feature = "location_event")]
@@ -78,7 +66,7 @@ use magnetometer_event::MagnetometerEvent;
 #[cfg(feature = "quaternion_event")]
 use quaternion_event::QuaternionEvent;
 
-/// Lists all (supported) events which can be sent by the controller. These come with the parsed event data and are the result of a [`parse`] call.
+/// Lists all (supported) events which can be sent by the controller. These come with the parsed event data.
 #[derive(PartialEq, Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(missing_docs)] // the names are already obvious enough
@@ -210,52 +198,111 @@ impl TryFrom<u8> for ControllerDataPackageType {
     }
 }
 
-#[cfg(feature = "heapless")]
-type ParseResult<const MAX_RESULTS: usize> =
-    Vec<Result<ControllerEvent, ProtocolParseError>, MAX_RESULTS>;
+/// Parse the input string for commands.
+///
+/// Null bytes (`b"\x00"`) will be skipped completely, unparseable content will return `Some(Err(ProtocolParseError))`
+/// but will not fail the parsing completely (i.e. you can continue to get the next entry until you reach the end of the input).
+///
+/// ## Example
+/// ```
+/// # use adafruit_bluefruit_protocol::button_event::{Button, ButtonParseError, ButtonState};
+/// # use adafruit_bluefruit_protocol::ControllerEvent::ButtonEvent;
+/// # use adafruit_bluefruit_protocol::{ControllerEvent, Parser, ProtocolParseError};
+///
+/// /// internal test helper
+/// fn assert_is_button_event(
+///     event: &Result<ControllerEvent, ProtocolParseError>,
+///     button: Button,
+///     button_state: ButtonState,
+/// ) {
+///     match event {
+///         Ok(ButtonEvent(event)) => {
+///             assert_eq!(event.button(), &button);
+///             assert_eq!(event.state(), &button_state)
+///         }
+///         _ => assert!(false),
+///     }
+/// }
+///
+/// // the example input contains some null bytes, two button events and two malformed events.
+/// let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00!B138";
+/// let mut parser = Parser::new(input);
+///
+/// assert_is_button_event(
+///     &parser.next().unwrap(),
+///     Button::Button1,
+///     ButtonState::Pressed,
+/// );
+/// assert_is_button_event(
+///     &parser.next().unwrap(),
+///     Button::Button1,
+///     ButtonState::Released,
+/// );
+/// assert_eq!(
+///     parser.next().unwrap(),
+///     Err(ProtocolParseError::UnknownEvent(Some(0)))
+/// );
+/// if let Err(e) = &parser.next().unwrap() {
+///     assert_eq!(
+///         e,
+///         &ProtocolParseError::ButtonParseError(ButtonParseError::UnknownButtonState(b'3'))
+///     );
+///     # {
+///         // test the `core::error::Error` implementation
+///         # extern crate alloc;
+///         # use alloc::string::ToString;
+///         # use core::error::Error;
+///         assert_eq!(
+///             e.source().unwrap().to_string(),
+///             "Unknown button state: 0x33"
+///         );
+///     # }
+/// } else {
+///     assert!(false, "expected an error");
+/// }
+/// assert_eq!(parser.next(), None);
+/// ```
+#[derive(Debug, Copy, Clone)]
+pub struct Parser<'a> {
+    input: &'a [u8],
+    curr_pos: usize,
+}
 
-#[cfg(feature = "alloc")]
-type ParseResult<const MAX_RESULTS: usize> = Vec<Result<ControllerEvent, ProtocolParseError>>;
-#[cfg(feature = "alloc")]
-const MAX_RESULTS: usize = 0;
-
-/// Parse the input string for commands. Unexpected content will be ignored if it's not formatted like a command!
-pub fn parse<#[cfg(feature = "heapless")] const MAX_RESULTS: usize>(
-    input: &[u8],
-) -> ParseResult<MAX_RESULTS> {
-    /// Simple state machine for the parser, represents whether the parser is seeking a start or has found it.
-    enum ParserState {
-        SeekStart,
-        ParseCommand,
+impl<'a> Parser<'a> {
+    /// Create a new parser. The input is parsed step by step on each invocation of `next`.
+    pub fn new(input: &'a [u8]) -> Self {
+        Self { input, curr_pos: 0 }
     }
-    let mut state = ParserState::SeekStart;
+}
 
-    let mut result = Vec::new();
+impl Iterator for Parser<'_> {
+    type Item = Result<ControllerEvent, ProtocolParseError>;
 
-    for pos in 0..input.len() {
-        let byte = input[pos];
-        match state {
-            ParserState::SeekStart => {
-                if byte == b'!' {
-                    state = ParserState::ParseCommand
+    fn next(&mut self) -> Option<Self::Item> {
+        /// Simple state machine for the parser, represents whether the parser is seeking a start or has found it.
+        enum ParserState {
+            SeekStart,
+            ParseCommand,
+        }
+        let mut state = ParserState::SeekStart;
+
+        for pos in self.curr_pos..self.input.len() {
+            let byte = self.input[pos];
+            match state {
+                ParserState::SeekStart => {
+                    if byte == b'!' {
+                        state = ParserState::ParseCommand
+                    }
                 }
-            }
-            ParserState::ParseCommand => {
-                let data_package = extract_and_parse_command(&input[(pos - 1)..]);
-                #[cfg(feature = "alloc")]
-                result.push(data_package);
-                #[cfg(feature = "heapless")]
-                result.push(data_package).ok();
-                #[cfg(feature = "heapless")]
-                if result.len() == MAX_RESULTS {
-                    return result;
+                ParserState::ParseCommand => {
+                    self.curr_pos = pos;
+                    return Some(extract_and_parse_command(&self.input[(pos - 1)..]));
                 }
-                state = ParserState::SeekStart;
-            }
-        };
+            };
+        }
+
+        None
     }
-
-    result
 }
 
 /// Extract a command and then try to parse it.
@@ -382,58 +429,12 @@ fn try_f32_from_le_bytes(input: &[u8]) -> Result<f32, ProtocolParseError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::button_event::{Button, ButtonParseError, ButtonState};
-    use crate::{check_crc, parse, try_f32_from_le_bytes, ControllerEvent, ProtocolParseError};
-
-    fn assert_is_button_event(
-        event: &Result<ControllerEvent, ProtocolParseError>,
-        button: Button,
-        button_state: ButtonState,
-    ) {
-        match event {
-            Ok(ControllerEvent::ButtonEvent(event)) => {
-                assert_eq!(event.button(), &button);
-                assert_eq!(event.state(), &button_state)
-            }
-            _ => assert!(false),
-        }
-    }
-
-    #[test]
-    fn test_parse() {
-        let input = b"\x00!B11:!B10;\x00\x00!\x00\x00\x00\x00!B138";
-        #[cfg(feature = "heapless")]
-        let result = parse::<4>(input);
-        #[cfg(feature = "alloc")]
-        let result = parse(input);
-
-        assert_eq!(result.len(), 4);
-        assert_is_button_event(&result[0], Button::Button1, ButtonState::Pressed);
-        assert_is_button_event(&result[1], Button::Button1, ButtonState::Released);
-        assert_eq!(result[2], Err(ProtocolParseError::UnknownEvent(Some(0))));
-        if let Err(e) = &result[3] {
-            assert_eq!(
-                e,
-                &ProtocolParseError::ButtonParseError(ButtonParseError::UnknownButtonState(b'3'))
-            );
-            #[cfg(feature = "alloc")]
-            {
-                use alloc::string::ToString;
-                use core::error::Error;
-                assert_eq!(
-                    e.source().unwrap().to_string(),
-                    "Unknown button state: 0x33"
-                );
-            }
-        } else {
-            assert!(false, "expected an error");
-        }
-    }
+    use crate::{check_crc, try_f32_from_le_bytes, ProtocolParseError};
 
     #[test]
     fn test_check_crc_ok() {
         let input = b"!B11:";
-        let data = &input[0..input.len() - 1];
+        let data = &input[..input.len() - 1];
         let crc = input.last().unwrap();
 
         assert!(check_crc(data, &crc).is_ok());
@@ -443,7 +444,7 @@ mod tests {
     fn test_check_crc_err() {
         let input = b"!B11;"; // should either be "!B11:" or "!B10;"
         let correct_crc = b':';
-        let data = &input[0..input.len() - 1];
+        let data = &input[..input.len() - 1];
         let crc = input.last().unwrap();
 
         assert_eq!(

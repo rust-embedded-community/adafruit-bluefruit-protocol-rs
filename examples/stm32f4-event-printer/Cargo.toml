@@ -17,7 +17,7 @@ defmt = "0.3.6"
 defmt-rtt = "0.4"
 
 # use `adafruit-bluefruit-protocol = "0.1"` in reality; path used here to ensure that the example always compiles against the latest master
-adafruit-bluefruit-protocol = { path = "../..", features = ["defmt", "heapless"] }
+adafruit-bluefruit-protocol = { path = "../..", features = ["defmt"] }
 
 [profile.release]
 codegen-units = 1

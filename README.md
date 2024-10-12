@@ -9,12 +9,6 @@ which is e.g. used by the [Adafruit Bluefruit LE UART Friend](https://learn.adaf
 
 Note that this work is not affiliated with Adafruit.
 
-## Mandatory Features
-This crate is `no_std` and you can choose whether you want to use
-[`heapless::Vec`](https://docs.rs/heapless/0.8.0/heapless/struct.Vec.html) by selecting the feature `heapless` or
-[`alloc::vec::Vec`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html) by selecting the feature `alloc`.
-If you select neither or both you'll get a compile error.
-
 ## Optional Features
 * `defmt`: you can enable the [`defmt`](https://defmt.ferrous-systems.com/) feature to get a `defmt::Format` implementation for all structs & enums and a `defmt::debug!` call for each command being parsed.
 * `rgb`: if enabled, `From<ColorEvent> for RGB8` is implemented to support the [RGB crate](https://crates.io/crates/rgb).
@@ -24,8 +18,8 @@ If you select neither or both you'll get a compile error.
   If other events are received, a `ProtocolParseError::DisabledControllerDataPackageType` will be returned.
 
 ## Usage
-The entry point to use this crate is the `parse` function. Note that this is a [sans I/O](https://sans-io.readthedocs.io/)
-crate, i.e. you have to talk to the Adafruit device, the `parse` function just expects a byte sequence.
+The entry point to use this crate is `Parser` which implements `Iterator` to access the events in the input.
+Note that this is a [sans I/O](https://sans-io.readthedocs.io/) crate, i.e. you have to talk to the Adafruit device, the parser just expects a byte sequence.
 
 ## Examples
 A simple example for the STM32F4 microcontrollers is [available](examples/stm32f4-event-printer/README.md).
