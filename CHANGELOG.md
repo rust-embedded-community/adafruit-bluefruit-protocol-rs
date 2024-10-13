@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+
+## [1.0.0] - 2024-10-13
 ### Added
 * `Copy`, `Clone` and `Hash` on error & event types (where possible)
 ### Changed
@@ -28,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The Minimum Supported Rust Version (MSRV) has been defined as 1.60.0 and is being enforced in `Cargo.toml`
 
 <!-- next-url -->
-[Unreleased]: https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/rust-embedded-community/adafruit-bluefruit-protocol-rs/compare/v0.1.0...v0.1.1
