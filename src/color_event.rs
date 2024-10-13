@@ -5,7 +5,7 @@ use super::ProtocolParseError;
 use rgb::RGB8;
 
 /// Represents a color event from the protocol.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[allow(missing_docs)] // the names are already obvious enough

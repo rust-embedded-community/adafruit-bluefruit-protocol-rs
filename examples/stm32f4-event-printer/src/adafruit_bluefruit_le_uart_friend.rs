@@ -84,8 +84,10 @@ impl BluefruitLEUARTFriend {
             filled_buffer
         );
 
-        let event = adafruit_bluefruit_protocol::parse::<4>(filled_buffer);
-        defmt::info!("received event(s) over bluetooth: {}", &event);
+        let parser = adafruit_bluefruit_protocol::Parser::new(filled_buffer);
+        for event in parser {
+            defmt::info!("received event over bluetooth: {:?}", &event);
+        }
 
         // switch out the buffers
         filled_buffer.fill(0);
