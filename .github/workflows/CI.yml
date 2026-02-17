@@ -23,8 +23,9 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           components: rustfmt clippy
+      - uses: cargo-bins/cargo-binstall@main
       - name: Install required cargo components
-        run: cargo +stable install cargo-audit clippy-sarif sarif-fmt
+        run: cargo binstall cargo-audit clippy-sarif sarif-fmt
       - name: build
         run: cargo build ${{ matrix.features }}
       - name: check
@@ -53,8 +54,9 @@ jobs:
         with:
           targets: thumbv7em-none-eabihf
           components: rustfmt clippy
+      - uses: cargo-bins/cargo-binstall@main
       - name: Install required cargo components
-        run: cargo install cargo-audit clippy-sarif sarif-fmt flip-link
+        run: cargo binstall cargo-audit clippy-sarif sarif-fmt flip-link
       - name: build
         run: cargo build
         working-directory: examples/stm32f4-event-printer
